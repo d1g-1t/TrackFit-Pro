@@ -1,40 +1,40 @@
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from datetime import datetime
-from typing import Optional
+
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class UserBase(BaseModel):
     email: EmailStr
-    username: str = Field(..., min_length=3, max_length=100)
-    full_name: Optional[str] = None
-    age: Optional[int] = Field(None, ge=10, le=120)
-    weight: Optional[float] = Field(None, gt=0, le=500)
-    height: Optional[float] = Field(None, gt=0, le=300)
-    gender: Optional[str] = Field(None, pattern="^(male|female|other)$")
+    username: str = Field(min_length=3, max_length=100)
+    full_name: str | None = None
+    age: int | None = Field(None, ge=10, le=120)
+    weight: float | None = Field(None, gt=0, le=500)
+    height: float | None = Field(None, gt=0, le=300)
+    gender: str | None = Field(None, pattern=r"^(male|female|other)$")
 
 
 class UserCreate(UserBase):
-    password: str = Field(..., min_length=8, max_length=100)
+    password: str = Field(min_length=8, max_length=100)
 
 
 class UserUpdate(BaseModel):
-    email: Optional[EmailStr] = None
-    username: Optional[str] = Field(None, min_length=3, max_length=100)
-    full_name: Optional[str] = None
-    age: Optional[int] = Field(None, ge=10, le=120)
-    weight: Optional[float] = Field(None, gt=0, le=500)
-    height: Optional[float] = Field(None, gt=0, le=300)
-    gender: Optional[str] = Field(None, pattern="^(male|female|other)$")
-    password: Optional[str] = Field(None, min_length=8, max_length=100)
+    email: EmailStr | None = None
+    username: str | None = Field(None, min_length=3, max_length=100)
+    full_name: str | None = None
+    age: int | None = Field(None, ge=10, le=120)
+    weight: float | None = Field(None, gt=0, le=500)
+    height: float | None = Field(None, gt=0, le=300)
+    gender: str | None = Field(None, pattern=r"^(male|female|other)$")
+    password: str | None = Field(None, min_length=8, max_length=100)
 
 
 class UserResponse(UserBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     is_active: bool
     created_at: datetime
     updated_at: datetime
-    
-    model_config = ConfigDict(from_attributes=True)
 
 
 class UserLogin(BaseModel):
@@ -48,4 +48,4 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    user_id: Optional[int] = None
+    user_id: int | None = None
