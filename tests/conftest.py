@@ -11,9 +11,7 @@ from src.core.security import get_password_hash
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
 engine = create_async_engine(TEST_DATABASE_URL, echo=False)
-TestSessionLocal = async_sessionmaker(
-    engine, class_=AsyncSession, expire_on_commit=False
-)
+TestSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 
 async def override_get_db():
@@ -32,10 +30,10 @@ async def override_get_db():
 async def db_session():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    
+
     async with TestSessionLocal() as session:
         yield session
-    
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
@@ -43,10 +41,10 @@ async def db_session():
 @pytest_asyncio.fixture
 async def client(db_session):
     app.dependency_overrides[get_db] = override_get_db
-    
+
     async with AsyncClient(app=app, base_url="http://test") as ac:
         yield ac
-    
+
     app.dependency_overrides.clear()
 
 
@@ -74,4 +72,3 @@ async def auth_headers(client, test_user):
     )
     token = response.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}
-
