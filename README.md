@@ -28,50 +28,19 @@
 ### Предварительные требования
 
 - Docker и Docker Compose
-- Make (опционально, для упрощения команд)
+- Make
 
 ### Запуск проекта
-
-1. **Клонируйте репозиторий**
 
 ```bash
 git clone <repository-url>
 cd trackfit-pro
+make setup
 ```
 
-2. **Создайте файл .env**
+`make setup` автоматически: создаёт `.env` из `.env.example`, собирает Docker-образы, запускает все сервисы, ждёт их готовности и применяет миграции БД.
 
-```bash
-cp .env.example .env
-```
-
-3. **Запустите проект через Docker**
-
-```bash
-make build
-make up
-```
-
-Или без Make:
-
-```bash
-docker-compose build
-docker-compose up -d
-```
-
-4. **Примените миграции базы данных**
-
-```bash
-make db-upgrade
-```
-
-Или без Make:
-
-```bash
-docker-compose exec api alembic upgrade head
-```
-
-5. **Приложение запущено!**
+После завершения:
 
 - API: http://localhost:8000
 - Документация Swagger: http://localhost:8000/docs
@@ -81,7 +50,7 @@ docker-compose exec api alembic upgrade head
 
 | Команда | Описание |
 |---------|----------|
-| `make help` | Показать все доступные команды |
+| `make setup` | Полная установка и запуск с нуля одной командой |
 | `make build` | Собрать Docker образы |
 | `make up` | Запустить все сервисы |
 | `make down` | Остановить все сервисы |
@@ -112,7 +81,9 @@ trackfit-pro/
 │   │   ├── database.py        # Подключение к БД
 │   │   ├── cache.py           # Redis кэширование
 │   │   ├── security.py        # Аутентификация и безопасность
-│   │   └── logging.py         # Настройка логирования
+│   │   ├── logging.py         # Настройка логирования
+│   │   ├── exceptions.py      # Кастомные исключения
+│   │   └── middleware.py       # Промежуточное ПО
 │   ├── models/
 │   │   └── models.py          # SQLAlchemy модели
 │   ├── schemas/
@@ -225,7 +196,7 @@ pip install uv
 2. **Установите зависимости**
 
 ```bash
-uv pip install -e ".[dev]"
+uv sync --all-extras
 ```
 
 3. **Настройте PostgreSQL и Redis локально**
