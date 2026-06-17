@@ -1,16 +1,16 @@
-from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
-from typing import Optional
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class GoalBase(BaseModel):
-    title: str = Field(..., min_length=1, max_length=255)
-    description: Optional[str] = Field(None, max_length=1000)
-    target_workouts_per_week: Optional[int] = Field(None, ge=1, le=50)
-    target_calories_per_week: Optional[float] = Field(None, gt=0)
-    target_distance_km: Optional[float] = Field(None, gt=0)
-    target_weight_kg: Optional[float] = Field(None, gt=0, le=500)
-    deadline: Optional[datetime] = None
+    title: str = Field(min_length=1, max_length=255)
+    description: str | None = Field(None, max_length=1000)
+    target_workouts_per_week: int | None = Field(None, ge=1, le=50)
+    target_calories_per_week: float | None = Field(None, gt=0)
+    target_distance_km: float | None = Field(None, gt=0)
+    target_weight_kg: float | None = Field(None, gt=0, le=500)
+    deadline: datetime | None = None
 
 
 class GoalCreate(GoalBase):
@@ -18,34 +18,34 @@ class GoalCreate(GoalBase):
 
 
 class GoalUpdate(BaseModel):
-    title: Optional[str] = Field(None, min_length=1, max_length=255)
-    description: Optional[str] = Field(None, max_length=1000)
-    target_workouts_per_week: Optional[int] = Field(None, ge=1, le=50)
-    target_calories_per_week: Optional[float] = Field(None, gt=0)
-    target_distance_km: Optional[float] = Field(None, gt=0)
-    target_weight_kg: Optional[float] = Field(None, gt=0, le=500)
-    deadline: Optional[datetime] = None
-    is_achieved: Optional[bool] = None
+    title: str | None = Field(None, min_length=1, max_length=255)
+    description: str | None = Field(None, max_length=1000)
+    target_workouts_per_week: int | None = Field(None, ge=1, le=50)
+    target_calories_per_week: float | None = Field(None, gt=0)
+    target_distance_km: float | None = Field(None, gt=0)
+    target_weight_kg: float | None = Field(None, gt=0, le=500)
+    deadline: datetime | None = None
+    is_achieved: bool | None = None
 
 
 class GoalResponse(GoalBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     user_id: int
     is_achieved: bool
     created_at: datetime
     updated_at: datetime
-    
-    model_config = ConfigDict(from_attributes=True)
 
 
 class GoalProgress(BaseModel):
     goal_id: int
     goal_title: str
     current_workouts: int
-    target_workouts: Optional[int]
+    target_workouts: int | None = None
     current_calories: float
-    target_calories: Optional[float]
+    target_calories: float | None = None
     current_distance: float
-    target_distance: Optional[float]
+    target_distance: float | None = None
     progress_percentage: float
     is_on_track: bool
