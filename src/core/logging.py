@@ -1,5 +1,6 @@
 import logging
 import sys
+from contextlib import suppress
 from datetime import UTC
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
@@ -8,7 +9,8 @@ from src.core.config import settings
 
 
 def setup_logging() -> None:
-    Path("logs").mkdir(exist_ok=True)
+    with suppress(OSError):
+        Path("logs").mkdir(exist_ok=True)
 
     log_level = getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO)
 
@@ -28,15 +30,16 @@ def setup_logging() -> None:
     console_handler.setFormatter(formatter)
     root_logger.addHandler(console_handler)
 
-    file_handler = RotatingFileHandler(
-        Path("logs/app.log"),
-        encoding="utf-8",
-        maxBytes=10 * 1024 * 1024,
-        backupCount=5,
-    )
-    file_handler.setLevel(log_level)
-    file_handler.setFormatter(formatter)
-    root_logger.addHandler(file_handler)
+    with suppress(OSError):
+        file_handler = RotatingFileHandler(
+            Path("logs/app.log"),
+            encoding="utf-8",
+            maxBytes=10 * 1024 * 1024,
+            backupCount=5,
+        )
+        file_handler.setLevel(log_level)
+        file_handler.setFormatter(formatter)
+        root_logger.addHandler(file_handler)
 
 
 def get_logger(name: str) -> logging.Logger:
