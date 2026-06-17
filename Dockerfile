@@ -1,33 +1,46 @@
 FROM ghcr.io/astral-sh/uv:latest AS uv
 
-FROM python:3.11-slim AS builder
+FROM python:3.11-slim
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
+    UV_SYSTEM_PYTHON=1 \
     UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy
+
+RUN groupadd -r appuser && useradd -r -g appuser -d /app appuser
 
 WORKDIR /app
 
 COPY --from=uv /uv /usr/local/bin/uv
 
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-install-project --no-dev
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv pip install --system --no-cache-dir \
+    fastapi \
+    "uvicorn[standard]" \
+    sqlalchemy \
+    alembic \
+    asyncpg \
+    redis \
+    pydantic \
+    pydantic-settings \
+    "python-jose[cryptography]" \
+    "passlib[bcrypt]" \
+    python-multipart \
+    cryptography \
+    ecdsa \
+    pyasn1 \
+    idna \
+    python-dotenv \
+    Mako \
+    starlette \
+    email-validator \
+    python-dateutil \
+    httpx
 
-
-FROM python:3.11-slim
-
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1
-
-RUN groupadd -r appuser && useradd -r -g appuser -d /app appuser
-
-WORKDIR /app
-
-COPY --from=builder --chown=appuser:appuser /app/.venv /app/.venv
 COPY --chown=appuser:appuser . .
-
-ENV PATH="/app/.venv/bin:$PATH"
+RUN mkdir -p /app/logs && chown -R appuser:appuser /app/logs
 
 EXPOSE 8000
 
