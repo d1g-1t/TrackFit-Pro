@@ -1,21 +1,26 @@
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
+import bcrypt
 import jwt
 from jwt import PyJWTError
-from passlib.context import CryptContext
 
 from src.core.config import settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# bcrypt operates on at most 72 bytes; longer inputs must be truncated by us.
+_BCRYPT_MAX_BYTES = 72
+
+
+def _to_bcrypt_bytes(password: str) -> bytes:
+    return password.encode("utf-8")[:_BCRYPT_MAX_BYTES]
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)  # type: ignore[no-any-return]
+    return bcrypt.checkpw(_to_bcrypt_bytes(plain_password), hashed_password.encode("utf-8"))
 
 
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)  # type: ignore[no-any-return]
+    return bcrypt.hashpw(_to_bcrypt_bytes(password), bcrypt.gensalt()).decode("utf-8")
 
 
 def create_access_token(data: dict[str, Any], expires_delta: timedelta | None = None) -> str:
