@@ -1,0 +1,17 @@
+{
+  "name": "TrackFit Pro API",
+  "install": "./.cursor/install.sh",
+  "start": "./.cursor/start.sh",
+  "terminals": [
+    {
+      "name": "api",
+      "command": "export PATH=\"$HOME/.local/bin:$PATH\" && uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
+    }
+  ],
+  "ports": [
+    {
+      "name": "API",
+      "port": 8000
+    }
+  ]
+}
