@@ -35,8 +35,8 @@ async def create_workout(
 
 @router.get("", response_model=list[WorkoutResponse])
 async def get_workouts(
-    skip: Annotated[int, Query(0, ge=0)] = 0,
-    limit: Annotated[int, Query(100, ge=1, le=500)] = 100,
+    skip: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=500)] = 100,
     workout_type: WorkoutType | None = None,
     current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
     db: Annotated[AsyncSession, Depends(get_db)] = None,  # type: ignore[assignment]
@@ -65,7 +65,7 @@ async def get_workouts(
 
 @router.get("/stats", response_model=WorkoutStats)
 async def get_workout_stats(
-    days: Annotated[int, Query(30, ge=1, le=365)] = 30,
+    days: Annotated[int, Query(ge=1, le=365)] = 30,
     current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
     db: Annotated[AsyncSession, Depends(get_db)] = None,  # type: ignore[assignment]
 ) -> WorkoutStats:
