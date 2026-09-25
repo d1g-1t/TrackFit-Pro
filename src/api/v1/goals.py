@@ -31,7 +31,7 @@ async def create_goal(
 
 @router.get("", response_model=list[GoalResponse])
 async def get_goals(
-    active_only: Annotated[bool, Query(False)] = False,
+    active_only: Annotated[bool, Query()] = False,
     current_user: Annotated[User, Depends(get_current_user)] = None,  # type: ignore[assignment]
     db: Annotated[AsyncSession, Depends(get_db)] = None,  # type: ignore[assignment]
 ) -> list[GoalResponse]:
